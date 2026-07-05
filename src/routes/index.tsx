@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ArrowRight, Check } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { PageLayout, SectionHeading } from "@/components/PageLayout";
 import { BtnLink } from "@/components/Button";
 import { CtaBanner } from "@/components/CtaBanner";

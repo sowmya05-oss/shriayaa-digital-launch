@@ -168,5 +168,3 @@ function HomePage() {
   );
 }
 
-// Keep the unused import from tree-shaking warnings
-void Check;

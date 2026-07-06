@@ -5,6 +5,15 @@ import {
   Gauge, Target, Handshake, Award, Globe2,
 } from "lucide-react";
 
+export const STATS = [
+  { label: "Years delivering enterprise software", value: "12+" },
+  { label: "Engineers, testers & architects on staff", value: "180" },
+  { label: "Platforms & products shipped to production", value: "240" },
+  { label: "Clients served across four continents", value: "60" },
+  { label: "Uptime maintained across managed environments", value: "99.95%" },
+  { label: "Release cycles automated end to end", value: "1,400+" },
+] as const;
+
 export const SERVICES = [
   {
     id: "consulting",

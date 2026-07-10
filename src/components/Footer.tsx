@@ -1,60 +1,88 @@
 import { Link } from "@tanstack/react-router";
-import { Mail, Phone, MapPin } from "lucide-react";
-import { LogoMark } from "./Logo";
+import type { ReactNode } from "react";
+import { Mail, MapPin } from "lucide-react";
+import { SERVICES } from "@/lib/content";
+import { Logo } from "./Logo";
+
+const CONTACT_EMAIL = "swarlaya77@gmail.com";
 
 export function Footer() {
-  const year = new Date().getFullYear();
   return (
-    <footer className="mt-24 border-t border-border bg-ink text-white/85">
-      <div className="container-page py-14 grid gap-10 md:grid-cols-4">
-        <div className="md:col-span-2 max-w-md">
-          <div className="flex items-center gap-3">
-            <LogoMark className="h-10 w-10" />
-            <div className="leading-tight">
-              <div className="font-display text-sm font-bold tracking-[0.14em] text-white">SHRIYAA QUANTUM</div>
-              <div className="text-[10px] tracking-[0.22em] text-white/60 mt-1">SOFTWARE PVT. LTD.</div>
-            </div>
-          </div>
-          <p className="mt-5 text-sm text-white/70 leading-relaxed">
-            End-to-end technology services across the full software lifecycle — consulting, engineering,
-            QA, deployment, infrastructure, and analytics — built to adapt to any industry.
+    <footer className="border-t border-[#D4A743] bg-[#FFF9E6] text-[#8B2E1F]">
+      <div className="container-page grid gap-10 py-10 md:grid-cols-2 md:gap-14 md:py-[60px] lg:grid-cols-[minmax(0,1.25fr)_minmax(160px,0.65fr)_minmax(240px,0.9fr)_minmax(220px,0.8fr)]">
+        <div className="max-w-md">
+          <Logo />
+          <p className="mt-5 text-sm leading-relaxed">Domain-Agnostic Technology Delivery</p>
+          <p className="mt-5 text-sm leading-relaxed text-[#4A4A4A]">
+            © 2026 Shriyaa Quantum Software Private Limited. All rights reserved.
           </p>
-          <ul className="mt-6 space-y-2 text-sm">
-            <li className="flex items-center gap-2.5"><Mail size={15} className="text-gold" /><a href="mailto:info@shriyaaquantum.com" className="hover:text-gold transition-colors">info@shriyaaquantum.com</a></li>
-            <li className="flex items-center gap-2.5"><Phone size={15} className="text-gold" /><a href="tel:+91XXXXXXXXXX" className="hover:text-gold transition-colors">+91-XXXXXXXXXX</a></li>
-            <li className="flex items-center gap-2.5"><MapPin size={15} className="text-gold" />City, State, India</li>
+        </div>
+
+        <div>
+          <h4 className="mb-4 font-display text-lg font-semibold text-[#A41E1B]">Quick Links</h4>
+          <ul className="space-y-3 text-sm">
+            <li>
+              <FooterLink to="/">Home</FooterLink>
+            </li>
+            <li>
+              <FooterLink to="/about">About</FooterLink>
+            </li>
+            <li>
+              <FooterLink to="/services">Services</FooterLink>
+            </li>
+            <li>
+              <FooterLink to="/why-us">Why Us</FooterLink>
+            </li>
+            <li>
+              <FooterLink to="/contact">Contact</FooterLink>
+            </li>
           </ul>
         </div>
 
         <div>
-          <h4 className="font-display text-sm font-semibold tracking-wide text-white mb-4">Company</h4>
-          <ul className="space-y-2.5 text-sm">
-            <li><Link to="/" className="hover:text-gold transition-colors">Home</Link></li>
-            <li><Link to="/about" className="hover:text-gold transition-colors">About</Link></li>
-            <li><Link to="/why-us" className="hover:text-gold transition-colors">Why Us</Link></li>
-            <li><Link to="/contact" className="hover:text-gold transition-colors">Contact</Link></li>
+          <h4 className="mb-4 font-display text-lg font-semibold text-[#A41E1B]">Services</h4>
+          <ul className="space-y-3 text-sm">
+            {SERVICES.map((service) => (
+              <li key={service.id}>
+                <FooterLink to="/services" hash={service.id}>
+                  {service.title}
+                </FooterLink>
+              </li>
+            ))}
           </ul>
         </div>
 
         <div>
-          <h4 className="font-display text-sm font-semibold tracking-wide text-white mb-4">Services</h4>
-          <ul className="space-y-2.5 text-sm">
-            <li><Link to="/services" hash="consulting" className="hover:text-gold transition-colors">Technology Consulting</Link></li>
-            <li><Link to="/services" hash="development" className="hover:text-gold transition-colors">Software Development</Link></li>
-            <li><Link to="/services" hash="qa" className="hover:text-gold transition-colors">QA & Testing</Link></li>
-            <li><Link to="/services" hash="deployment" className="hover:text-gold transition-colors">Deployment</Link></li>
-            <li><Link to="/services" hash="infrastructure" className="hover:text-gold transition-colors">Infrastructure</Link></li>
-            <li><Link to="/services" hash="data" className="hover:text-gold transition-colors">Data & Analytics</Link></li>
+          <h4 className="mb-4 font-display text-lg font-semibold text-[#A41E1B]">Contact</h4>
+          <ul className="space-y-3 text-sm">
+            <li className="flex items-center gap-2.5">
+              <Mail size={16} className="text-[#A41E1B]" />
+              <a
+                href={`mailto:${CONTACT_EMAIL}`}
+                className="text-[#C84D41] transition-colors hover:underline"
+              >
+                {CONTACT_EMAIL}
+              </a>
+            </li>
+            <li className="flex items-center gap-2.5">
+              <MapPin size={16} className="text-[#A41E1B]" />
+              <span>Chennai, Tamil Nadu, India</span>
+            </li>
           </ul>
-        </div>
-      </div>
-
-      <div className="border-t border-white/10">
-        <div className="container-page py-5 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-white/55">
-          <div>© {year} Shriyaa Quantum Software Private Limited. All rights reserved.</div>
-          <div className="tracking-wide"><span className="text-gold">◆</span> Domain-Agnostic Technology Delivery</div>
         </div>
       </div>
     </footer>
+  );
+}
+
+function FooterLink({ to, hash, children }: { to: string; hash?: string; children: ReactNode }) {
+  return (
+    <Link
+      to={to}
+      hash={hash}
+      className="font-medium text-[#C84D41] transition-colors hover:underline"
+    >
+      {children}
+    </Link>
   );
 }

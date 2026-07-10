@@ -1,5 +1,5 @@
-import { Link } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { Link, useRouterState } from "@tanstack/react-router";
+import { useEffect, useRef, useState } from "react";
 import { Menu, X } from "lucide-react";
 import { Logo } from "./Logo";
 
@@ -7,80 +7,96 @@ const NAV = [
   { to: "/", label: "Home" },
   { to: "/about", label: "About" },
   { to: "/services", label: "Services" },
-  { to: "/solutions", label: "Solutions" },
   { to: "/why-us", label: "Why Us" },
   { to: "/contact", label: "Contact" },
 ] as const;
 
 export function Header() {
   const [open, setOpen] = useState(false);
-  const [scrolled, setScrolled] = useState(false);
+  const pathname = useRouterState({ select: (state) => state.location.pathname });
+  const menuRef = useRef<HTMLDivElement>(null);
+  const buttonRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 8);
-    onScroll();
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
-  }, []);
-
-  useEffect(() => {
-    document.body.style.overflow = open ? "hidden" : "";
-    return () => { document.body.style.overflow = ""; };
+    if (!open) return;
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setOpen(false);
+    };
+    const onPointerDown = (event: PointerEvent) => {
+      const target = event.target as Node;
+      if (menuRef.current?.contains(target) || buttonRef.current?.contains(target)) return;
+      setOpen(false);
+    };
+    document.addEventListener("keydown", onKeyDown);
+    document.addEventListener("pointerdown", onPointerDown);
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.removeEventListener("keydown", onKeyDown);
+      document.removeEventListener("pointerdown", onPointerDown);
+      document.body.style.overflow = "";
+    };
   }, [open]);
 
   return (
-    <header
-      className={`sticky top-0 z-50 w-full transition-all ${
-        scrolled ? "bg-background/85 backdrop-blur border-b border-border" : "bg-background/60 backdrop-blur-sm"
-      }`}
-    >
-      <div className="container-page flex h-18 items-center justify-between py-3">
+    <header className="fixed left-0 top-0 z-[1000] w-full border-b border-[#D4A743]/30 bg-[#FFFEF5]">
+      <div className="container-page flex min-h-[84px] items-center justify-between gap-5 py-4">
         <Logo />
 
-        <nav className="hidden lg:flex items-center gap-1">
+        <nav className="hidden shrink-0 items-center gap-1 lg:flex" aria-label="Primary navigation">
           {NAV.map((item) => (
             <Link
               key={item.to}
               to={item.to}
               activeOptions={{ exact: item.to === "/" }}
-              activeProps={{ className: "text-brand" }}
-              inactiveProps={{ className: "text-ink/75 hover:text-brand" }}
-              className="px-3.5 py-2 text-sm font-medium tracking-tight transition-colors relative"
+              activeProps={{ className: "text-[#A41E1B] after:scale-x-100" }}
+              inactiveProps={{
+                className:
+                  "text-[#8B2E1F] after:scale-x-0 hover:text-[#C84D41] hover:after:scale-x-100",
+              }}
+              className="relative px-3.5 py-2 text-sm font-medium transition-colors after:absolute after:bottom-1 after:left-3.5 after:right-3.5 after:h-0.5 after:origin-left after:bg-[#C84D41] after:transition-transform"
             >
               {item.label}
             </Link>
           ))}
           <Link
             to="/contact"
-            className="ml-3 inline-flex items-center rounded-full bg-brand px-5 py-2.5 text-sm font-semibold text-primary-foreground shadow-sm hover:bg-brand-dark transition-colors"
+            className="ml-3 inline-flex items-center rounded-full bg-[linear-gradient(135deg,#C84D41_0%,#C84D41_38%,#D4A743_100%)] px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-[0_0_30px_rgba(196,61,49,0.4)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#A41E1B]/45 focus-visible:ring-offset-2 focus-visible:ring-offset-[#FFFEF5]"
           >
-            Contact Us
+            Get Started
           </Link>
         </nav>
 
         <button
+          ref={buttonRef}
           type="button"
           onClick={() => setOpen((v) => !v)}
-          className="lg:hidden inline-flex h-11 w-11 items-center justify-center rounded-lg border border-border text-ink"
+          className="inline-flex h-11 w-11 items-center justify-center rounded-lg border border-[#A41E1B]/25 text-[#A41E1B] transition-colors hover:bg-[#C84D41]/10 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#A41E1B]/45 lg:hidden"
           aria-label={open ? "Close menu" : "Open menu"}
           aria-expanded={open}
+          aria-controls="mobile-navigation"
         >
           {open ? <X size={22} /> : <Menu size={22} />}
         </button>
       </div>
 
       {open && (
-        <div className="lg:hidden border-t border-border bg-background">
-          <nav className="container-page flex flex-col py-4">
+        <div
+          ref={menuRef}
+          id="mobile-navigation"
+          className="border-t border-[#D4A743]/30 bg-[#FFFEF5] shadow-[0_16px_40px_rgba(139,46,31,0.12)] lg:hidden"
+        >
+          <nav className="container-page flex flex-col py-4" aria-label="Mobile navigation">
             {NAV.map((item) => (
               <Link
                 key={item.to}
                 to={item.to}
                 onClick={() => setOpen(false)}
                 activeOptions={{ exact: item.to === "/" }}
-                activeProps={{ className: "text-brand" }}
-                inactiveProps={{ className: "text-ink" }}
-                className="py-3 text-base font-medium border-b border-border/60 last:border-0"
+                className={`border-b border-[#D4A743]/20 py-3 text-base font-medium transition-colors last:border-0 ${
+                  pathname === item.to
+                    ? "text-[#A41E1B] underline decoration-2 underline-offset-4"
+                    : "text-[#8B2E1F] hover:text-[#C84D41]"
+                }`}
               >
                 {item.label}
               </Link>
@@ -88,9 +104,9 @@ export function Header() {
             <Link
               to="/contact"
               onClick={() => setOpen(false)}
-              className="mt-4 inline-flex items-center justify-center rounded-full bg-brand px-5 py-3 text-sm font-semibold text-primary-foreground"
+              className="mt-4 inline-flex items-center justify-center rounded-full bg-[linear-gradient(135deg,#C84D41_0%,#C84D41_38%,#D4A743_100%)] px-5 py-3 text-sm font-semibold text-white shadow-sm"
             >
-              Contact Us
+              Get Started
             </Link>
           </nav>
         </div>

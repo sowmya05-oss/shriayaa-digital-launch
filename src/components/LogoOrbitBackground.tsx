@@ -3,12 +3,36 @@ type LogoOrbitBackgroundProps = {
 };
 
 const planets = [
-  { rotate: -18, x: 464, y: 260, r: 6, delay: "0s", duration: "18s" },
-  { rotate: 42, x: 456, y: 260, r: 5, delay: "-4s", duration: "22s" },
-  { rotate: 104, x: 458, y: 260, r: 5.5, delay: "-9s", duration: "20s" },
-  { rotate: -68, x: 448, y: 260, r: 4.5, delay: "-13s", duration: "24s" },
-  { rotate: 76, x: 438, y: 260, r: 5, delay: "-16s", duration: "26s" },
+  { orbit: 0, r: 6, delay: "0s", duration: "18s" },
+  { orbit: 1, r: 5, delay: "-4s", duration: "22s" },
+  { orbit: 2, r: 5.5, delay: "-9s", duration: "20s" },
+  { orbit: 0, r: 4.5, delay: "-13s", duration: "24s" },
+  { orbit: 1, r: 5, delay: "-16s", duration: "26s" },
 ];
+
+const orbits = [
+  { id: "hero-orbit-path-0", rx: 210, ry: 82, rotate: -18, strokeWidth: 5 },
+  { id: "hero-orbit-path-1", rx: 206, ry: 78, rotate: 42, strokeWidth: 4 },
+  { id: "hero-orbit-path-2", rx: 198, ry: 74, rotate: 104, strokeWidth: 4 },
+];
+
+function buildOrbitPath(rx: number, ry: number, rotate: number) {
+  const cx = 260;
+  const cy = 260;
+  const radians = (rotate * Math.PI) / 180;
+  const cos = Math.cos(radians);
+  const sin = Math.sin(radians);
+  const points = Array.from({ length: 145 }, (_, index) => {
+    const angle = (index / 144) * Math.PI * 2;
+    const x = Math.cos(angle) * rx;
+    const y = Math.sin(angle) * ry;
+    return [cx + x * cos - y * sin, cy + x * sin + y * cos];
+  });
+
+  return points
+    .map(([x, y], index) => `${index === 0 ? "M" : "L"}${x.toFixed(2)} ${y.toFixed(2)}`)
+    .join(" ");
+}
 
 export function LogoOrbitBackground({ className }: LogoOrbitBackgroundProps) {
   return (
@@ -54,33 +78,15 @@ export function LogoOrbitBackground({ className }: LogoOrbitBackgroundProps) {
         <circle cx="260" cy="260" r="138" fill="url(#orbitCore)" />
 
         <g fill="none" strokeLinecap="round">
-          <ellipse
-            cx="260"
-            cy="260"
-            rx="210"
-            ry="82"
-            stroke="url(#orbitStroke)"
-            strokeWidth="5"
-            transform="rotate(-18 260 260)"
-          />
-          <ellipse
-            cx="260"
-            cy="260"
-            rx="206"
-            ry="78"
-            stroke="url(#orbitStroke)"
-            strokeWidth="4"
-            transform="rotate(42 260 260)"
-          />
-          <ellipse
-            cx="260"
-            cy="260"
-            rx="198"
-            ry="74"
-            stroke="url(#orbitStroke)"
-            strokeWidth="4"
-            transform="rotate(104 260 260)"
-          />
+          {orbits.map((orbit) => (
+            <path
+              key={orbit.id}
+              id={orbit.id}
+              d={buildOrbitPath(orbit.rx, orbit.ry, orbit.rotate)}
+              stroke="url(#orbitStroke)"
+              strokeWidth={orbit.strokeWidth}
+            />
+          ))}
         </g>
 
         <g className="hero-logo-ribbons" fill="none" strokeLinecap="round" strokeLinejoin="round">
@@ -138,27 +144,19 @@ export function LogoOrbitBackground({ className }: LogoOrbitBackgroundProps) {
         <g filter="url(#softGlow)">
           {planets.map((planet, index) => (
             <g
-              key={`${planet.rotate}-${planet.duration}`}
+              key={`${planet.orbit}-${planet.duration}`}
               className="hero-orbit-planet"
-              transform={`rotate(${planet.rotate} 260 260)`}
             >
-              <animateTransform
-                attributeName="transform"
-                type="rotate"
-                from={`${planet.rotate + index * 22} 260 260`}
-                to={`${360 + planet.rotate + index * 22} 260 260`}
+              <animateMotion
                 dur={planet.duration}
                 begin={planet.delay}
                 repeatCount="indefinite"
-              />
-              <circle
-                cx={planet.x}
-                cy={planet.y}
-                r={planet.r + 4}
-                fill="#FFFEF5"
-                fillOpacity="0.26"
-              />
-              <circle cx={planet.x} cy={planet.y} r={planet.r} fill="#D4A743" fillOpacity="0.3" />
+                rotate="0"
+              >
+                <mpath href={`#${orbits[planet.orbit].id}`} />
+              </animateMotion>
+              <circle r={planet.r + 4} fill="#FFFEF5" fillOpacity="0.3" />
+              <circle r={planet.r} fill="#D4A743" fillOpacity="0.42" />
             </g>
           ))}
         </g>

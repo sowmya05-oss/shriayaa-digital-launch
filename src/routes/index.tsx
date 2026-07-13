@@ -93,12 +93,13 @@ function HomePage() {
           <div className="hero-ray right-[5%] -rotate-[19deg]" />
         </div>
 
-        <div className="container-page relative z-10 flex min-h-[calc(100svh-84px)] items-center justify-center py-20 text-center md:py-[120px]">
+        <div className="container-page relative z-10 flex min-h-[calc(100svh-80px)] items-center justify-center py-14 text-center sm:min-h-[calc(100svh-96px)] sm:py-20 md:py-[120px]">
           <div className="mx-auto max-w-5xl">
-            <h1 className="fade-up text-[2.75rem] font-semibold leading-[1.08] text-[#A41E1B] md:text-[4.5rem] lg:text-[5.25rem]">
-              Innovate. Integrate. <span className="text-[#D4A743]">Elevate.</span>
+            <h1 className="fade-up text-[2rem] font-semibold leading-[1.08] text-[#A41E1B] min-[380px]:text-[2.35rem] sm:text-[2.75rem] md:text-[4.5rem] lg:text-[5.25rem]">
+              <span className="whitespace-nowrap">Innovate. Integrate.</span>
+              <span className="block text-[#D4A743]">Elevate.</span>
             </h1>
-            <p className="fade-up mx-auto mt-5 max-w-2xl text-lg leading-relaxed text-[#8B2E1F]">
+            <p className="fade-up mx-auto mt-5 max-w-2xl text-base leading-relaxed text-[#8B2E1F] sm:text-lg">
               End-to-end software lifecycle services across every industry
             </p>
             <div className="fade-up mt-9 flex flex-col justify-center gap-3 sm:flex-row">

@@ -2,9 +2,8 @@ import { Link } from "@tanstack/react-router";
 import type { ReactNode } from "react";
 import { Mail, MapPin } from "lucide-react";
 import { SERVICES } from "@/lib/content";
+import { CONTACT_EMAIL } from "@/lib/contact";
 import { Logo } from "./Logo";
-
-const CONTACT_EMAIL = "swarlaya77@gmail.com";
 
 export function Footer() {
   return (

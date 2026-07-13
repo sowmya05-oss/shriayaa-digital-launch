@@ -36,7 +36,7 @@ export function PageLayout({ children }: { children: ReactNode }) {
   return (
     <div className="flex min-h-screen flex-col">
       <Header />
-      <main className="flex-1 pt-[84px]">{children}</main>
+      <main className="flex-1 pt-20 sm:pt-24">{children}</main>
       <Footer />
     </div>
   );
@@ -52,18 +52,18 @@ interface PageHeroProps {
 export function PageHero({ eyebrow, title, subtitle, children }: PageHeroProps) {
   return (
     <section className="relative overflow-hidden bg-[#FFFEF5]">
-      <div className="container-page relative py-20 md:py-24">
+      <div className="container-page relative py-16 sm:py-20 md:py-24">
         {eyebrow && (
           <div className="inline-flex items-center gap-2 rounded-full border border-gold/40 bg-gold-soft/30 px-3.5 py-1 text-xs font-semibold tracking-widest text-[#E8A020] uppercase mb-6 fade-up">
             <span className="h-1.5 w-1.5 rounded-full bg-[#C41E1E]" />
             {eyebrow}
           </div>
         )}
-        <h1 className="fade-up max-w-3xl text-4xl font-semibold leading-tight text-[#A41E1B] md:text-5xl lg:text-6xl">
+        <h1 className="fade-up max-w-3xl text-[2.35rem] font-semibold leading-tight text-[#A41E1B] sm:text-4xl md:text-5xl lg:text-6xl">
           {title}
         </h1>
         {subtitle && (
-          <p className="fade-up mt-5 max-w-2xl text-lg leading-relaxed text-[#8B2E1F]">
+          <p className="fade-up mt-5 max-w-2xl text-base leading-relaxed text-[#8B2E1F] sm:text-lg">
             {subtitle}
           </p>
         )}

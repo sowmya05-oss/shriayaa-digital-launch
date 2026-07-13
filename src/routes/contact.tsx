@@ -3,9 +3,30 @@ import { useState, type ChangeEvent, type FormEvent, type ReactNode } from "reac
 import { CheckCircle2, Loader2, Mail, MapPin, Send } from "lucide-react";
 import { PageLayout } from "@/components/PageLayout";
 import { BtnButton } from "@/components/Button";
+import { CONTACT_EMAIL } from "@/lib/contact";
 import { SERVICES } from "@/lib/content";
 
 export const Route = createFileRoute("/contact")({
+  server: {
+    handlers: {
+      POST: async ({ request }) => {
+        const payload = (await request.json()) as Partial<FormState>;
+        const form = normalizeForm(payload);
+        const errors = validate(form);
+
+        if (Object.keys(errors).length > 0) {
+          return Response.json({ ok: false, errors }, { status: 400 });
+        }
+
+        const result = await sendContactEmail(form);
+        if (!result.ok) {
+          return Response.json({ ok: false, message: result.message }, { status: 500 });
+        }
+
+        return Response.json({ ok: true });
+      },
+    },
+  },
   head: () => ({
     meta: [
       { title: "Contact — Shriyaa Quantum Software" },
@@ -23,7 +44,6 @@ export const Route = createFileRoute("/contact")({
   component: ContactPage,
 });
 
-const CONTACT_EMAIL = "swarlaya77@gmail.com";
 const INTERESTS = [...SERVICES.map((service) => service.title), "Other"];
 const INITIAL = { name: "", email: "", company: "", interest: "", message: "" };
 
@@ -35,6 +55,7 @@ function ContactPage() {
   const [errors, setErrors] = useState<ErrorState>({});
   const [submitted, setSubmitted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState("");
 
   const set =
     (key: keyof FormState) =>
@@ -50,22 +71,35 @@ function ContactPage() {
     if (Object.keys(nextErrors).length > 0) return;
 
     setSubmitting(true);
-    const subject = `Website enquiry - ${form.interest || "Project discussion"} - ${form.company || form.name}`;
-    const body = [
-      `Full Name: ${form.name}`,
-      `Work Email: ${form.email}`,
-      `Company: ${form.company || "Not provided"}`,
-      `Interested in: ${form.interest || "Not provided"}`,
-      "",
-      "Message:",
-      form.message,
-    ].join("\n");
+    setSubmitError("");
 
-    window.setTimeout(() => {
-      window.location.href = `mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-      setSubmitting(false);
-      setSubmitted(true);
-    }, 450);
+    fetch("/contact", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(form),
+    })
+      .then(async (response) => {
+        const data = (await response.json().catch(() => ({}))) as {
+          ok?: boolean;
+          message?: string;
+          errors?: ErrorState;
+        };
+
+        if (!response.ok || !data.ok) {
+          if (data.errors) setErrors(data.errors);
+          throw new Error(data.message || "We could not send the message. Please try again.");
+        }
+
+        setSubmitted(true);
+      })
+      .catch((error) => {
+        setSubmitError(
+          error instanceof Error
+            ? error.message
+            : "We could not send the message. Please try again.",
+        );
+      })
+      .finally(() => setSubmitting(false));
   };
 
   return (
@@ -129,17 +163,18 @@ function ContactPage() {
                   <CheckCircle2 size={30} />
                 </div>
                 <h2 className="mt-5 text-2xl font-semibold text-[#A41E1B]">
-                  Message ready to send
+                  Message sent
                 </h2>
                 <p className="mt-3 text-base leading-8 text-[#8B2E1F]">
-                  Your email client should open with a pre-filled draft to {CONTACT_EMAIL}. Send it
-                  from there and we will have the details in the inbox.
+                  Thank you. Your enquiry has been sent to {CONTACT_EMAIL}, and we will get back to
+                  you soon.
                 </p>
                 <BtnButton
                   className="mt-6"
                   onClick={() => {
                     setForm(INITIAL);
                     setErrors({});
+                    setSubmitError("");
                     setSubmitted(false);
                   }}
                 >
@@ -211,11 +246,11 @@ function ContactPage() {
                   className="w-full disabled:cursor-not-allowed disabled:opacity-70 sm:w-auto"
                 >
                   {submitting ? <Loader2 size={16} className="animate-spin" /> : <Send size={16} />}
-                  {submitting ? "Preparing Message" : "Send Message"}
+                  {submitting ? "Sending Message" : "Send Message"}
                 </BtnButton>
+                {submitError && <p className="text-sm leading-6 text-[#A41E1B]">{submitError}</p>}
                 <p className="text-xs leading-6 text-[#4A4A4A]">
-                  This form uses a mailto handoff to {CONTACT_EMAIL}, so no project details are
-                  stored on the website.
+                  Your enquiry is sent securely to {CONTACT_EMAIL}.
                 </p>
               </form>
             )}
@@ -234,6 +269,64 @@ function validate(form: FormState) {
     errors.email = "Please enter a valid email address.";
   if (!form.message.trim()) errors.message = "Please tell us a little about your project.";
   return errors;
+}
+
+function normalizeForm(payload: Partial<FormState>): FormState {
+  return {
+    name: String(payload.name ?? "").trim(),
+    email: String(payload.email ?? "").trim(),
+    company: String(payload.company ?? "").trim(),
+    interest: String(payload.interest ?? "").trim(),
+    message: String(payload.message ?? "").trim(),
+  };
+}
+
+async function sendContactEmail(form: FormState): Promise<{ ok: boolean; message?: string }> {
+  const relayUrl = process.env.SMTP_RELAY_URL;
+  const relayToken = process.env.SMTP_RELAY_TOKEN;
+
+  if (!relayUrl) {
+    return {
+      ok: false,
+      message:
+        "SMTP is not configured yet. Please set SMTP_RELAY_URL and SMTP_RELAY_TOKEN on the server.",
+    };
+  }
+
+  const subject = `Website enquiry - ${form.interest || "Project discussion"} - ${form.company || form.name}`;
+  const text = [
+    `Full Name: ${form.name}`,
+    `Work Email: ${form.email}`,
+    `Company: ${form.company || "Not provided"}`,
+    `Interested in: ${form.interest || "Not provided"}`,
+    "",
+    "Message:",
+    form.message,
+  ].join("\n");
+
+  const response = await fetch(relayUrl, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      ...(relayToken ? { Authorization: `Bearer ${relayToken}` } : {}),
+    },
+    body: JSON.stringify({
+      to: CONTACT_EMAIL,
+      from: process.env.SMTP_FROM_EMAIL || CONTACT_EMAIL,
+      replyTo: form.email,
+      subject,
+      text,
+    }),
+  });
+
+  if (!response.ok) {
+    return {
+      ok: false,
+      message: "The SMTP service rejected the message. Please try again later.",
+    };
+  }
+
+  return { ok: true };
 }
 
 function InfoCard({

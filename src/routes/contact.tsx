@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import nodemailer from "nodemailer";
 import { useState, type ChangeEvent, type FormEvent, type ReactNode } from "react";
 import { CheckCircle2, Loader2, Mail, MapPin, Send } from "lucide-react";
 import { PageLayout } from "@/components/PageLayout";
@@ -282,14 +283,17 @@ function normalizeForm(payload: Partial<FormState>): FormState {
 }
 
 async function sendContactEmail(form: FormState): Promise<{ ok: boolean; message?: string }> {
-  const relayUrl = process.env.SMTP_RELAY_URL;
-  const relayToken = process.env.SMTP_RELAY_TOKEN;
+  const host = process.env.SMTP_HOST;
+  const port = Number(process.env.SMTP_PORT || "465");
+  const user = process.env.SMTP_USER;
+  const pass = process.env.SMTP_PASS;
+  const from = process.env.SMTP_FROM_EMAIL || user || CONTACT_EMAIL;
 
-  if (!relayUrl) {
+  if (!host || !user || !pass) {
     return {
       ok: false,
       message:
-        "SMTP is not configured yet. Please set SMTP_RELAY_URL and SMTP_RELAY_TOKEN on the server.",
+        "SMTP is not configured yet. Please set SMTP_HOST, SMTP_USER, and SMTP_PASS on the server.",
     };
   }
 
@@ -304,22 +308,22 @@ async function sendContactEmail(form: FormState): Promise<{ ok: boolean; message
     form.message,
   ].join("\n");
 
-  const response = await fetch(relayUrl, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      ...(relayToken ? { Authorization: `Bearer ${relayToken}` } : {}),
-    },
-    body: JSON.stringify({
+  try {
+    const transporter = nodemailer.createTransport({
+      host,
+      port,
+      secure: port === 465,
+      auth: { user, pass },
+    });
+
+    await transporter.sendMail({
       to: CONTACT_EMAIL,
-      from: process.env.SMTP_FROM_EMAIL || CONTACT_EMAIL,
+      from,
       replyTo: form.email,
       subject,
       text,
-    }),
-  });
-
-  if (!response.ok) {
+    });
+  } catch {
     return {
       ok: false,
       message: "The SMTP service rejected the message. Please try again later.",

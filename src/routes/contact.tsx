@@ -1,32 +1,12 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState, type ChangeEvent, type FormEvent, type ReactNode } from "react";
-import { CheckCircle2, Loader2, Mail, MapPin, Send } from "lucide-react";
+import { CheckCircle2, Mail, MapPin, Send } from "lucide-react";
 import { PageLayout } from "@/components/PageLayout";
 import { BtnButton } from "@/components/Button";
 import { CONTACT_EMAIL } from "@/lib/contact";
 import { SERVICES } from "@/lib/content";
 
 export const Route = createFileRoute("/contact")({
-  server: {
-    handlers: {
-      POST: async ({ request }) => {
-        const payload = (await request.json()) as Partial<FormState>;
-        const form = normalizeForm(payload);
-        const errors = validate(form);
-
-        if (Object.keys(errors).length > 0) {
-          return Response.json({ ok: false, errors }, { status: 400 });
-        }
-
-        const result = await sendContactEmail(form);
-        if (!result.ok) {
-          return Response.json({ ok: false, message: result.message }, { status: 500 });
-        }
-
-        return Response.json({ ok: true });
-      },
-    },
-  },
   head: () => ({
     meta: [
       { title: "Contact — Shriyaa Quantum Software" },
@@ -54,7 +34,6 @@ function ContactPage() {
   const [form, setForm] = useState<FormState>(INITIAL);
   const [errors, setErrors] = useState<ErrorState>({});
   const [submitted, setSubmitted] = useState(false);
-  const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState("");
 
   const set =
@@ -70,36 +49,25 @@ function ContactPage() {
     setErrors(nextErrors);
     if (Object.keys(nextErrors).length > 0) return;
 
-    setSubmitting(true);
     setSubmitError("");
 
-    fetch("/contact", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(form),
-    })
-      .then(async (response) => {
-        const data = (await response.json().catch(() => ({}))) as {
-          ok?: boolean;
-          message?: string;
-          errors?: ErrorState;
-        };
+    const subject = `Website enquiry - ${form.interest || "Project discussion"} - ${
+      form.company || form.name
+    }`;
+    const body = [
+      `Full Name: ${form.name}`,
+      `Work Email: ${form.email}`,
+      `Company: ${form.company || "Not provided"}`,
+      `Interested in: ${form.interest || "Not provided"}`,
+      "",
+      "Message:",
+      form.message,
+    ].join("\n");
 
-        if (!response.ok || !data.ok) {
-          if (data.errors) setErrors(data.errors);
-          throw new Error(data.message || "We could not send the message. Please try again.");
-        }
-
-        setSubmitted(true);
-      })
-      .catch((error) => {
-        setSubmitError(
-          error instanceof Error
-            ? error.message
-            : "We could not send the message. Please try again.",
-        );
-      })
-      .finally(() => setSubmitting(false));
+    window.location.href = `mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent(
+      subject,
+    )}&body=${encodeURIComponent(body)}`;
+    setSubmitted(true);
   };
 
   return (
@@ -163,11 +131,11 @@ function ContactPage() {
                   <CheckCircle2 size={30} />
                 </div>
                 <h2 className="mt-5 text-2xl font-semibold text-[#A41E1B]">
-                  Message sent
+                  Redirected to your mailbox
                 </h2>
                 <p className="mt-3 text-base leading-8 text-[#8B2E1F]">
-                  Thank you. Your enquiry has been sent to {CONTACT_EMAIL}, and we will get back to
-                  you soon.
+                  Thank you. Your email app has been opened with our address and your message
+                  prefilled.
                 </p>
                 <BtnButton
                   className="mt-6"
@@ -242,15 +210,14 @@ function ContactPage() {
                 </Field>
                 <BtnButton
                   type="submit"
-                  disabled={submitting}
-                  className="w-full disabled:cursor-not-allowed disabled:opacity-70 sm:w-auto"
+                  className="w-full sm:w-auto"
                 >
-                  {submitting ? <Loader2 size={16} className="animate-spin" /> : <Send size={16} />}
-                  {submitting ? "Sending Message" : "Send Message"}
+                  <Send size={16} />
+                  Send Message
                 </BtnButton>
                 {submitError && <p className="text-sm leading-6 text-[#A41E1B]">{submitError}</p>}
                 <p className="text-xs leading-6 text-[#4A4A4A]">
-                  Your enquiry is sent securely to {CONTACT_EMAIL}.
+                  This opens your mailbox with the message addressed to {CONTACT_EMAIL}.
                 </p>
               </form>
             )}
@@ -269,58 +236,6 @@ function validate(form: FormState) {
     errors.email = "Please enter a valid email address.";
   if (!form.message.trim()) errors.message = "Please tell us a little about your project.";
   return errors;
-}
-
-function normalizeForm(payload: Partial<FormState>): FormState {
-  return {
-    name: String(payload.name ?? "").trim(),
-    email: String(payload.email ?? "").trim(),
-    company: String(payload.company ?? "").trim(),
-    interest: String(payload.interest ?? "").trim(),
-    message: String(payload.message ?? "").trim(),
-  };
-}
-
-async function sendContactEmail(form: FormState): Promise<{ ok: boolean; message?: string }> {
-  const accessKey = process.env.WEB3FORMS_ACCESS_KEY;
-
-  if (!accessKey) {
-    return {
-      ok: false,
-      message:
-        "Contact form is not configured yet. Please set WEB3FORMS_ACCESS_KEY on the server.",
-    };
-  }
-
-  const subject = `Website enquiry - ${form.interest || "Project discussion"} - ${form.company || form.name}`;
-
-  try {
-    const response = await fetch("https://api.web3forms.com/submit", {
-      method: "POST",
-      headers: { "Content-Type": "application/json", Accept: "application/json" },
-      body: JSON.stringify({
-        access_key: accessKey,
-        subject,
-        from_name: form.name,
-        name: form.name,
-        email: form.email,
-        company: form.company || "Not provided",
-        interest: form.interest || "Not provided",
-        message: form.message,
-        replyto: form.email,
-        to: CONTACT_EMAIL,
-      }),
-    });
-
-    if (!response.ok) throw new Error("Web3Forms rejected the message.");
-  } catch {
-    return {
-      ok: false,
-      message: "The contact form service rejected the message. Please try again later.",
-    };
-  }
-
-  return { ok: true };
 }
 
 function InfoCard({

@@ -1,5 +1,4 @@
 import { createFileRoute } from "@tanstack/react-router";
-import nodemailer from "nodemailer";
 import { useState, type ChangeEvent, type FormEvent, type ReactNode } from "react";
 import { CheckCircle2, Loader2, Mail, MapPin, Send } from "lucide-react";
 import { PageLayout } from "@/components/PageLayout";
@@ -283,50 +282,41 @@ function normalizeForm(payload: Partial<FormState>): FormState {
 }
 
 async function sendContactEmail(form: FormState): Promise<{ ok: boolean; message?: string }> {
-  const host = process.env.SMTP_HOST;
-  const port = Number(process.env.SMTP_PORT || "465");
-  const user = process.env.SMTP_USER;
-  const pass = process.env.SMTP_PASS;
-  const from = process.env.SMTP_FROM_EMAIL || user || CONTACT_EMAIL;
+  const accessKey = process.env.WEB3FORMS_ACCESS_KEY;
 
-  if (!host || !user || !pass) {
+  if (!accessKey) {
     return {
       ok: false,
       message:
-        "SMTP is not configured yet. Please set SMTP_HOST, SMTP_USER, and SMTP_PASS on the server.",
+        "Contact form is not configured yet. Please set WEB3FORMS_ACCESS_KEY on the server.",
     };
   }
 
   const subject = `Website enquiry - ${form.interest || "Project discussion"} - ${form.company || form.name}`;
-  const text = [
-    `Full Name: ${form.name}`,
-    `Work Email: ${form.email}`,
-    `Company: ${form.company || "Not provided"}`,
-    `Interested in: ${form.interest || "Not provided"}`,
-    "",
-    "Message:",
-    form.message,
-  ].join("\n");
 
   try {
-    const transporter = nodemailer.createTransport({
-      host,
-      port,
-      secure: port === 465,
-      auth: { user, pass },
+    const response = await fetch("https://api.web3forms.com/submit", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", Accept: "application/json" },
+      body: JSON.stringify({
+        access_key: accessKey,
+        subject,
+        from_name: form.name,
+        name: form.name,
+        email: form.email,
+        company: form.company || "Not provided",
+        interest: form.interest || "Not provided",
+        message: form.message,
+        replyto: form.email,
+        to: CONTACT_EMAIL,
+      }),
     });
 
-    await transporter.sendMail({
-      to: CONTACT_EMAIL,
-      from,
-      replyTo: form.email,
-      subject,
-      text,
-    });
+    if (!response.ok) throw new Error("Web3Forms rejected the message.");
   } catch {
     return {
       ok: false,
-      message: "The SMTP service rejected the message. Please try again later.",
+      message: "The contact form service rejected the message. Please try again later.",
     };
   }
 

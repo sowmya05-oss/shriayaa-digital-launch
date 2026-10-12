@@ -5,15 +5,17 @@ import { APPROACH_STEPS, VALUES } from "@/lib/content";
 export const Route = createFileRoute("/about")({
   head: () => ({
     meta: [
-      { title: "About — Shriyaa Quantum Software" },
+      { title: "About Shriyaa Quantum" },
       {
         name: "description",
-        content: "Who we are, how we work, and the principles that shape our delivery.",
+        content:
+          "A Chennai-based company offering enterprise talent, technology services and India business set-up, shaped by experience inside global automotive and industrial organisations.",
       },
-      { property: "og:title", content: "About — Shriyaa Quantum Software" },
+      { property: "og:title", content: "About Shriyaa Quantum" },
       {
         property: "og:description",
-        content: "Who we are, how we work, and the principles that shape our delivery.",
+        content:
+          "A Chennai-based company offering enterprise talent, technology services and India business set-up, shaped by experience inside global automotive and industrial organisations.",
       },
     ],
   }),
@@ -29,78 +31,49 @@ function AboutPage() {
         <div className="tech-hero-motif pointer-events-none absolute inset-0 opacity-[0.18]" />
         <div className="container-page relative text-center">
           <h1 className="text-[2.5rem] font-semibold leading-tight text-[#A41E1B] md:text-[3.5rem]">
-            About Us
+            About Shriyaa Quantum
           </h1>
           <p className="mx-auto mt-5 max-w-4xl text-base leading-relaxed text-[#8B2E1F] md:text-lg">
-            A domain-agnostic technology company delivering reliable software lifecycle services.
+            We are a Chennai-based company offering enterprise talent, technology services and India
+            business set-up support. Our work is shaped by a team that has spent many years inside
+            global automotive, mobility and industrial organisations — so we approach every
+            engagement from the client's point of view.
           </p>
-          <div className="reveal-stagger mx-auto mt-10 grid max-w-4xl gap-3 sm:grid-cols-3">
-            {["6 lifecycle services", "Any industry vertical", "QA to production"].map((item) => (
-              <div
-                key={item}
-                className="reveal rounded-lg border border-[#D4A743]/25 bg-[#FFFBF0]/70 px-4 py-3 text-sm font-semibold text-[#A41E1B] shadow-[0_12px_36px_rgba(139,46,31,0.05)]"
-              >
-                {item}
-              </div>
-            ))}
-          </div>
         </div>
       </section>
 
       <section className="page-grid-band section-circuit-edge py-16 md:py-24">
         <div className="container-page">
-          <p className="reveal mb-8 text-center text-sm font-semibold uppercase tracking-[0.18em] text-[#C84D41]">
-            Who We Are
-          </p>
           <div className="grid gap-10 lg:grid-cols-[0.78fr_1.22fr] lg:items-stretch">
             <div className="reveal flex h-full flex-col justify-center rounded-xl border border-[#D4A743]/25 bg-[#FFFBF0]/82 p-7 shadow-[0_20px_70px_rgba(139,46,31,0.07)] md:p-9">
               <h2 className="text-3xl font-semibold leading-tight text-[#A41E1B] md:text-4xl">
-                Domain-agnostic by design. Delivery focused by practice.
+                Who we are
               </h2>
-              <div className="mt-6 grid grid-cols-2 gap-2">
-                {[
-                  "Technology",
-                  "Health-care",
-                  "Finance",
-                  "Retail",
-                  "Public Sector",
-                  "Education",
-                  "Manufacturing",
-                  "Operations",
-                ].map((domain) => (
-                  <span
-                    key={domain}
-                    className="rounded-full border border-[#D4A743]/25 bg-[#FFFEF5]/72 px-3 py-2 text-center text-xs font-semibold text-[#8B2E1F]"
-                  >
-                    {domain}
-                  </span>
-                ))}
-              </div>
+              <p className="mt-6 text-base leading-8 text-[#8B2E1F] md:text-lg">
+                Our team combines experience in enterprise finance, shared services, enterprise
+                systems, new business set-up and technology delivery, across India, Europe and
+                Asia-Pacific.
+              </p>
             </div>
 
             <div className="reveal h-full space-y-4 rounded-xl border border-[#D4A743]/25 bg-[#FFFEF5]/78 p-7 text-base leading-8 text-[#8B2E1F] shadow-[0_18px_70px_rgba(139,46,31,0.05)] md:p-10 md:text-lg">
               <p>
-                Shriyaa Quantum Software Private Limited is a technology company delivering
-                end-to-end technology services across the full software lifecycle.
+                <strong>Built for</strong>
               </p>
-              <p>
-                We provide technology consulting, software development, quality assurance and
-                testing, deployment services, and infrastructure services.
-              </p>
-              <p>
-                These are supported by dedicated data and analytics capabilities, including the
-                systems, components, and testing tools required to deliver them reliably.
-              </p>
-              <p>
-                We are deliberately not domain-specific. Our capabilities are built to cut across
-                every industry vertical, providing the appropriate platform, working environment,
-                reusable components, and both test and production environments needed for any
-                domain, from finance to healthcare to retail to the public sector.
-              </p>
-              <p>
-                This domain-agnostic foundation lets us adapt quickly to a client's specific
-                technical landscape rather than forcing a one-size-fits-all template.
-              </p>
+              <ul className="list-disc space-y-3 pl-6">
+                <li>
+                  <strong>IT service companies</strong> needing dependable SAP, Oracle, Dynamics and
+                  Salesforce specialists
+                </li>
+                <li>
+                  <strong>Overseas companies</strong> looking for practical help to set up and run
+                  in India
+                </li>
+                <li>
+                  <strong>Organisations</strong> seeking well-delivered technology or clear
+                  strategy, finance and growth advice
+                </li>
+              </ul>
             </div>
           </div>
 
@@ -109,18 +82,17 @@ function AboutPage() {
               <div className="absolute inset-x-0 top-0 h-1 bg-[#A41E1B]" />
               <h2 className="text-2xl font-semibold text-[#A41E1B] md:text-3xl">Mission</h2>
               <p className="mt-4 text-base leading-8 text-[#8B2E1F] md:text-lg">
-                To deliver reliable, domain-agnostic technology services that help organizations
-                move from strategy through production with clarity, quality, and long-term
-                maintainability.
+                To give our clients the right people, the right technology and a sound footing in
+                India — with the discipline large organisations expect and the responsiveness of a
+                smaller team.
               </p>
             </article>
             <article className="card-elevated card-tech reveal relative overflow-hidden p-7 md:p-9">
               <div className="absolute inset-x-0 top-0 h-1 bg-[linear-gradient(90deg,#A41E1B,#D4A743)]" />
               <h2 className="text-2xl font-semibold text-[#A41E1B] md:text-3xl">Vision</h2>
               <p className="mt-4 text-base leading-8 text-[#8B2E1F] md:text-lg">
-                To become a trusted long-term technology partner across industries, known for
-                practical engineering, dependable delivery, and systems that keep improving after
-                launch.
+                To be a dependable India partner for global manufacturers and the technology
+                companies that serve them.
               </p>
             </article>
           </div>
@@ -129,7 +101,7 @@ function AboutPage() {
 
       <section className="home-service-band section-circuit-edge py-16 md:py-24">
         <div className="container-page">
-          <SectionHeading align="center" title="How We Work" />
+          <SectionHeading align="center" title="How we work" />
           <div className="reveal-stagger mt-12 grid gap-4 md:grid-cols-3 lg:grid-cols-6">
             {APPROACH_STEPS.map((step) => (
               <article key={step.n} className="card-elevated card-tech reveal p-5 text-center">
@@ -146,20 +118,41 @@ function AboutPage() {
 
       <section className="home-data-grid section-circuit-edge py-16 md:py-24">
         <div className="container-page">
-          <SectionHeading align="center" title="What We Value" />
-          <div className="reveal-stagger mt-12 grid gap-8 md:grid-cols-2 lg:grid-cols-5">
+          <SectionHeading align="center" title="What we value" />
+          <div className="reveal-stagger mt-12 grid auto-rows-fr items-stretch gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
             {VALUES.map((value) => {
               const Icon = value.icon;
               return (
                 <article
                   key={value.title}
-                  className="card-tech reveal rounded-xl border border-[#D4A743]/20 bg-[#FFFEF5]/65 p-4 text-center transition-all hover:bg-[#FFFBF0] hover:shadow-[0_16px_50px_rgba(139,46,31,0.06)]"
+                  className="card-tech reveal flex h-full min-h-[220px] flex-col items-center rounded-xl border border-[#D4A743]/20 bg-[#FFFEF5]/65 p-5 text-center transition-all hover:bg-[#FFFBF0] hover:shadow-[0_16px_50px_rgba(139,46,31,0.06)]"
                 >
                   <div className="mx-auto grid h-12 w-12 place-items-center rounded-full bg-[#C84D41]/8 text-[#A41E1B]">
                     <Icon size={24} />
                   </div>
-                  <h3 className="mt-4 text-lg font-semibold text-[#A41E1B]">{value.title}</h3>
-                  <p className="mt-3 text-sm leading-7 text-[#8B2E1F]">{value.desc}</p>
+                  <h3 className="mt-4 flex min-h-12 items-center justify-center text-lg font-semibold text-[#A41E1B]">
+                    {value.title}
+                  </h3>
+                  <p className="mt-3 flex-1 text-sm leading-7 text-[#8B2E1F]">
+                    {value.title === "Quality" ? (
+                      <>
+                        Work that holds up
+                        <br className="hidden xl:block" /> in real use.
+                      </>
+                    ) : value.title === "Understanding the business" ? (
+                      <>
+                        Not just the system
+                        <br className="hidden xl:block" /> or the task.
+                      </>
+                    ) : value.title === "Reliability" ? (
+                      <>
+                        Doing what we said,
+                        <br className="hidden xl:block" /> when we said.
+                      </>
+                    ) : (
+                      value.desc
+                    )}
+                  </p>
                 </article>
               );
             })}

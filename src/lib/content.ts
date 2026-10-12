@@ -183,36 +183,36 @@ export const WHY_US = [
 ] as const;
 
 export const VALUES = [
-  { icon: Award, title: "Quality", desc: "Reliability and craftsmanship are non-negotiable." },
+  { icon: Award, title: "Quality", desc: "Work that holds up in real use." },
   {
     icon: Globe2,
-    title: "Domain Agnosticism",
-    desc: "Our capabilities adapt to your industry, not the other way around.",
+    title: "Understanding the business",
+    desc: "Not just the system or the task.",
   },
   {
     icon: ShieldCheck,
     title: "Reliability",
-    desc: "Repeatable practices that hold up under real production load.",
+    desc: "Doing what we said, when we said.",
   },
   {
     icon: Target,
-    title: "Precision",
-    desc: "Deliberate engineering choices, not reactive shortcuts.",
+    title: "Integrity",
+    desc: "Transparent commercials and full compliance.",
   },
   {
     icon: Handshake,
     title: "Partnership",
-    desc: "We stay accountable from first workshop through long-term support.",
+    desc: "Long-term relationships over one-off transactions.",
   },
 ] as const;
 
 export const APPROACH_STEPS = [
-  { n: "01", title: "Understand", desc: "Business goals, users, and existing landscape." },
-  { n: "02", title: "Assess", desc: "Current systems, risks, and technical fit." },
-  { n: "03", title: "Design", desc: "Architecture, roadmap, and delivery plan." },
-  { n: "04", title: "Build & Test", desc: "Engineer with QA and automation from day one." },
-  { n: "05", title: "Deploy", desc: "Low-risk, repeatable release to production." },
-  { n: "06", title: "Support", desc: "Monitor, maintain, and evolve continuously." },
+  { n: "01", title: "Listen", desc: "Understand your goals, constraints and timelines." },
+  { n: "02", title: "Assess", desc: "Review the current situation: skills, systems, market or regulatory needs." },
+  { n: "03", title: "Recommend", desc: "Propose the simplest approach that fits, with clear scope and cost." },
+  { n: "04", title: "Mobilise", desc: "Put the right people, partners and processes in place." },
+  { n: "05", title: "Deliver", desc: "Execute with regular reporting and a single point of contact." },
+  { n: "06", title: "Review & improve", desc: "Check outcomes together and adjust." },
 ] as const;
 
 export const CAPABILITIES = [

@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState, type ChangeEvent, type FormEvent, type ReactNode } from "react";
-import { CheckCircle2, Mail, MapPin, Send } from "lucide-react";
+import { CheckCircle2, Send } from "lucide-react";
 import { PageLayout } from "@/components/PageLayout";
 import { BtnButton } from "@/components/Button";
 import { CONTACT_EMAIL } from "@/lib/contact";
@@ -12,12 +12,14 @@ export const Route = createFileRoute("/contact")({
       { title: "Contact — Shriyaa Quantum Software" },
       {
         name: "description",
-        content: "Tell us about your project and start a technology roadmap conversation.",
+        content:
+          "Contact Shriyaa Quantum, Perungudi, Chennai — enterprise platform specialists, India set-up and technology services.",
       },
       { property: "og:title", content: "Contact — Shriyaa Quantum Software" },
       {
         property: "og:description",
-        content: "Tell us about your project and start a technology roadmap conversation.",
+        content:
+          "Contact Shriyaa Quantum, Perungudi, Chennai — enterprise platform specialists, India set-up and technology services.",
       },
     ],
   }),
@@ -25,7 +27,24 @@ export const Route = createFileRoute("/contact")({
 });
 
 const INTERESTS = [...SERVICES.map((service) => service.title), "Other"];
-const INITIAL = { name: "", email: "", company: "", interest: "", message: "" };
+const HELP_OPTIONS = [
+  "Enterprise platform specialists (SAP, Oracle, Dynamics, Salesforce)",
+  "Setting up in India",
+  "Industry or finance advisory",
+  "Ticketing, gates & access systems",
+  "Technology services",
+  "Careers",
+  "Other",
+] as const;
+const INITIAL = {
+  help: "",
+  name: "",
+  email: "",
+  company: "",
+  interest: "",
+  message: "",
+  website: "",
+};
 
 type FormState = typeof INITIAL;
 type ErrorState = Partial<Record<keyof FormState, string>>;
@@ -45,16 +64,16 @@ function ContactPage() {
 
   const onSubmit = (event: FormEvent) => {
     event.preventDefault();
+    if (form.website.trim()) return;
     const nextErrors = validate(form);
     setErrors(nextErrors);
     if (Object.keys(nextErrors).length > 0) return;
 
     setSubmitError("");
 
-    const subject = `Website enquiry - ${form.interest || "Project discussion"} - ${
-      form.company || form.name
-    }`;
+    const subject = `Website Enquiry – ${form.help} – ${form.name}`;
     const body = [
+      `How can we help?: ${form.help}`,
       `Full Name: ${form.name}`,
       `Work Email: ${form.email}`,
       `Company: ${form.company || "Not provided"}`,
@@ -97,18 +116,29 @@ function ContactPage() {
               enough to start a useful conversation.
             </p>
 
-            <div className="mt-8 grid gap-4">
-              <InfoCard
-                icon={<Mail size={21} />}
-                label="Email"
-                href={`mailto:${CONTACT_EMAIL}`}
-                value={CONTACT_EMAIL}
-              />
-              <InfoCard
-                icon={<MapPin size={21} />}
-                label="Location"
-                value="Chennai, Tamil Nadu, India"
-              />
+            <div className="card-elevated card-tech mt-8 p-5 md:p-6">
+              <h3 className="text-lg font-semibold text-[#A41E1B]">
+                Shriyaa Quantum Software Private Limited
+              </h3>
+              <address className="mt-3 space-y-2 text-sm not-italic leading-6 text-[#4A4A4A]">
+                <p>
+                  96, Ramaniyam Greeta Tower, Perungudi Industrial Road, Perungudi, Chennai –
+                  600096, Tamil Nadu, India.
+                </p>
+                <p>
+                  Phone:{" "}
+                  <a className="font-medium text-[#8B2E1F]" href="tel:+919884608360">
+                    +91 98846 08360
+                  </a>
+                </p>
+                <p>
+                  Email:{" "}
+                  <a className="font-medium text-[#8B2E1F]" href={`mailto:${CONTACT_EMAIL}`}>
+                    {CONTACT_EMAIL}
+                  </a>
+                </p>
+                <p>CIN: U62010TN2026PTC194589</p>
+              </address>
             </div>
 
             <div className="card-tech mt-8 rounded-xl bg-[linear-gradient(135deg,#3A1110_0%,#A41E1B_60%,#D4A743_130%)] p-7 text-white">
@@ -151,6 +181,42 @@ function ContactPage() {
               </div>
             ) : (
               <form className="space-y-5" noValidate onSubmit={onSubmit}>
+                <p className="text-sm leading-6 text-[#4A4A4A]">
+                  Tell us briefly what you are looking for. We will get back to you to understand
+                  your requirement and suggest next steps.
+                </p>
+                <div
+                  aria-hidden="true"
+                  className="absolute left-[-10000px] h-px w-px overflow-hidden"
+                >
+                  <label htmlFor="website">Leave this field empty</label>
+                  <input
+                    id="website"
+                    name="website"
+                    type="text"
+                    autoComplete="off"
+                    tabIndex={-1}
+                    value={form.website}
+                    onChange={set("website")}
+                  />
+                </div>
+                <Field label="How can we help?" required error={errors.help} htmlFor="help">
+                  <select
+                    id="help"
+                    name="help"
+                    required
+                    value={form.help}
+                    onChange={set("help")}
+                    className={inputClass(Boolean(errors.help))}
+                  >
+                    <option value="">Please select</option>
+                    {HELP_OPTIONS.map((option) => (
+                      <option key={option} value={option}>
+                        {option}
+                      </option>
+                    ))}
+                  </select>
+                </Field>
                 <Field label="Full Name" required error={errors.name} htmlFor="name">
                   <input
                     id="name"
@@ -208,10 +274,7 @@ function ContactPage() {
                     className={`${inputClass(Boolean(errors.message))} min-h-36 resize-y`}
                   />
                 </Field>
-                <BtnButton
-                  type="submit"
-                  className="w-full sm:w-auto"
-                >
+                <BtnButton type="submit" className="w-full sm:w-auto">
                   <Send size={16} />
                   Send Message
                 </BtnButton>
@@ -230,49 +293,13 @@ function ContactPage() {
 
 function validate(form: FormState) {
   const errors: ErrorState = {};
+  if (!form.help) errors.help = "Please select how we can help.";
   if (!form.name.trim()) errors.name = "Please enter your full name.";
   if (!form.email.trim()) errors.email = "Please enter your work email.";
   else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email.trim()))
     errors.email = "Please enter a valid email address.";
   if (!form.message.trim()) errors.message = "Please tell us a little about your project.";
   return errors;
-}
-
-function InfoCard({
-  icon,
-  label,
-  value,
-  href,
-}: {
-  icon: ReactNode;
-  label: string;
-  value: string;
-  href?: string;
-}) {
-  const content = (
-    <>
-      <span className="grid h-11 w-11 shrink-0 place-items-center rounded-lg bg-[#C84D41]/8 text-[#A41E1B]">
-        {icon}
-      </span>
-      <span>
-        <span className="block text-sm text-[#4A4A4A]">{label}</span>
-        <span className="block font-semibold text-[#8B2E1F]">{value}</span>
-      </span>
-    </>
-  );
-
-  if (href) {
-    return (
-      <a
-        href={href}
-        className="card-elevated card-elevated-hover card-tech flex items-center gap-4 p-5"
-      >
-        {content}
-      </a>
-    );
-  }
-
-  return <div className="card-elevated card-tech flex items-center gap-4 p-5">{content}</div>;
 }
 
 function Field({

@@ -75,6 +75,22 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
 const SITE_TITLE = "Shriyaa Quantum Software | Domain Agnostic Technology Delivery";
 const SITE_DESC =
   "End to end technology services across the full software lifecycle, including consulting, engineering, QA, deployment, infrastructure, and analytics built to adapt to any industry.";
+const ORGANIZATION_SCHEMA = {
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  name: "Shriyaa Quantum Software Private Limited",
+  legalName: "Shriyaa Quantum Software Private Limited",
+  address: {
+    "@type": "PostalAddress",
+    streetAddress: "96, Ramaniyam Greeta Tower, Perungudi Industrial Road, Perungudi",
+    addressLocality: "Chennai",
+    postalCode: "600096",
+    addressRegion: "Tamil Nadu",
+    addressCountry: "IN",
+  },
+  telephone: "+91 98846 08360",
+  email: "info@shriyaaquantum.co.in",
+};
 
 export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()({
   head: () => ({
@@ -112,6 +128,10 @@ function RootShell({ children }: { children: ReactNode }) {
     <html lang="en">
       <head>
         <HeadContent />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(ORGANIZATION_SCHEMA) }}
+        />
       </head>
       <body>
         {children}
